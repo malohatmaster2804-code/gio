@@ -1,0 +1,361 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Mystery Postcard Games</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  :root{
+    --blue:#0b5fa5; --btn:#0b5fa5; --teal:#12a4a4; --gold:#f2b134; --ink:#16324f;
+    --red:#d94f4f; --green:#2e9e5b; --card:#ffffff; --line:#e3d9c3; --bg:#eef6fb; --soft:#eef3f8;
+    --paper1:#ffffff; --paper2:#fff9ec; --okbg:#e8f7ee;
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+    --blue:#7bbcf5; --green:#4cc07f; --red:#ef7a7a; --card:#172a3f; --line:#2c435c; --bg:#0f1c2b; --ink:#e6eef7;
+    --soft:#21374f; --paper1:#172a3f; --paper2:#1b3048; --okbg:#14392a; color-scheme:dark}}
+  :root[data-theme="dark"]{
+    --blue:#7bbcf5; --green:#4cc07f; --red:#ef7a7a; --card:#172a3f; --line:#2c435c; --bg:#0f1c2b; --ink:#e6eef7;
+    --soft:#21374f; --paper1:#172a3f; --paper2:#1b3048; --okbg:#14392a; color-scheme:dark}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,Arial,sans-serif;color:var(--ink);
+    background:var(--bg);min-height:100vh}
+  header{text-align:center;padding-block:18px 4px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  header h1{margin:0;font-size:clamp(22px,4vw,36px);color:var(--blue);letter-spacing:.5px}
+  header p{margin:4px 0 0;opacity:.8}
+  .wrap{max-width:1000px;margin:0 auto;padding-block:10px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+  /* scoreboard */
+  .board{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:12px 0}
+  .team{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:8px 10px;cursor:pointer;
+    text-align:center;transition:.15s}
+  .team.active{border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,177,52,.35);transform:translateY(-2px)}
+  .team b{display:block;font-size:14px}
+  .team .pts{font-size:26px;font-weight:800;color:var(--blue)}
+  .team .adj button{border:0;color:var(--ink);background:var(--soft);border-radius:6px;width:28px;height:24px;cursor:pointer;font-weight:700}
+  .hint{font-size:13px;text-align:center;opacity:.75;margin:-4px 0 10px}
+
+  nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:8px 0 14px}
+  nav button{border:2px solid var(--blue);background:var(--card);color:var(--blue);padding:9px 16px;border-radius:999px;
+    font-weight:700;cursor:pointer;font-size:15px}
+  nav button.on{background:var(--btn);border-color:var(--btn);color:#fff}
+
+  section{display:none}
+  section.on{display:block}
+  .panel{background:var(--card);border-radius:16px;padding:20px;box-shadow:0 6px 20px rgba(11,95,165,.12)}
+  h2{margin:0 0 6px;color:var(--blue)}
+  .sub{margin:0 0 14px;opacity:.8}
+
+  button.btn{border:0;border-radius:10px;padding:10px 16px;font-weight:700;font-size:15px;cursor:pointer;color:#fff;background:var(--btn)}
+  button.btn.gold{background:var(--gold);color:#4a3200}
+  button.btn.green{background:var(--green)}
+  button.btn.red{background:var(--red)}
+  button.btn.gray{background:#8a97a6}
+  button.btn:disabled{opacity:.4;cursor:not-allowed}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+  /* postcard */
+  .postcard{display:grid;grid-template-columns:1fr 1fr;border:3px solid var(--ink);border-radius:10px;overflow:hidden;
+    background:repeating-linear-gradient(45deg,var(--paper1) 0 12px,var(--paper2) 12px 24px);min-height:230px}
+  .pc-left{padding:18px;background:linear-gradient(135deg,var(--teal),var(--btn));color:#fff;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center}
+  .pc-left .big{font-size:68px;line-height:1.1}
+  .pc-left .stamp{margin-top:8px;border:2px dashed #fff;padding:3px 10px;border-radius:6px;font-weight:700}
+  .pc-right{padding:16px 18px;border-left:3px dashed var(--ink)}
+  .clue{background:var(--card);border-left:5px solid var(--gold);padding:8px 10px;margin:7px 0;border-radius:6px;
+    animation:pop .3s ease;font-size:17px}
+  .clue.empty{border-left-color:#ccc;opacity:.45;font-style:italic}
+  @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+  .answer{margin-top:12px;padding:12px;border-radius:10px;background:var(--okbg);border:2px solid var(--green);display:none}
+  .answer.show{display:block;animation:pop .3s}
+  .meta{display:flex;justify-content:space-between;font-weight:700;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+  .pill{background:var(--gold);color:#4a3200;border-radius:999px;padding:3px 12px}
+  .phrases{margin-top:12px;font-size:14px;background:var(--soft);padding:8px 12px;border-radius:8px}
+
+  /* memory */
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:560px;margin:12px auto}
+  .mc{aspect-ratio:1/1;perspective:600px;cursor:pointer;border:0;background:none;padding:0}
+  .mc .in{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+  .mc.flip .in{transform:rotateY(180deg)}
+  .mc .f,.mc .b{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;
+    justify-content:center;text-align:center;font-weight:800}
+  .mc .f{background:linear-gradient(135deg,var(--btn),var(--teal));color:#fff;font-size:30px}
+  .mc .b{transform:rotateY(180deg);background:var(--card);border:3px solid var(--gold);font-size:clamp(16px,3vw,22px);flex-direction:column}
+  .mc .b .e{font-size:clamp(28px,6vw,44px)}
+  .mc.done .b{background:var(--okbg);border-color:var(--green)}
+  .stats{display:flex;gap:16px;justify-content:center;font-weight:700;flex-wrap:wrap}
+
+  /* scramble */
+  .scr{font-size:clamp(34px,8vw,64px);letter-spacing:.2em;font-weight:800;text-align:center;color:var(--blue);margin:10px 0}
+  .scr-emoji{font-size:56px;text-align:center}
+  .timer{height:12px;background:var(--soft);border-radius:99px;overflow:hidden;margin:10px 0}
+  .timer i{display:block;height:100%;width:100%;background:var(--teal);transition:width 1s linear}
+  input.ans{width:100%;background:var(--card);color:var(--ink);padding:12px;font-size:22px;border:3px solid var(--line);border-radius:10px;text-align:center;
+    text-transform:uppercase;letter-spacing:.15em}
+  input.ans:focus{outline:0;border-color:var(--blue)}
+  .msg{min-height:26px;text-align:center;font-weight:700;margin-top:8px}
+  .ok{color:var(--green)} .no{color:var(--red)}
+
+  @media(max-width:640px){.postcard{grid-template-columns:1fr}.pc-right{border-left:0;border-top:3px dashed var(--ink)}}
+</style>
+
+<header>
+  <h1>✈️ Mystery Postcard Games</h1>
+  <p>Warm-up / Icebreaker · Travelling in Uzbekistan · 3 minutes</p>
+</header>
+
+<div class="wrap">
+  <div class="board" id="board"></div>
+  <div class="hint">Click a team to make it <b>active</b>. Points from the games go to the active team. Use ± to adjust manually.</div>
+
+  <nav>
+    <button class="on" data-tab="g1">1 · Mystery Postcard</button>
+    <button data-tab="g2">2 · Memory Match</button>
+    <button data-tab="g3">3 · Word Scramble</button>
+  </nav>
+
+  <!-- GAME 1 -->
+  <section id="g1" class="on">
+    <div class="panel">
+      <h2>🗺️ Game 1 – Mystery Postcard</h2>
+      <p class="sub">Read the clues one by one. The fewer clues a team needs, the more points it gets (4 → 1). Teams say: <i>"I think it's …!"</i></p>
+      <div class="meta"><span id="p-count">Postcard 1 / 7</span><span class="pill" id="p-points">Worth: 4 points</span></div>
+      <div class="postcard">
+        <div class="pc-left"><div class="big" id="p-emoji">❓</div><div class="stamp">UZBEKISTAN</div></div>
+        <div class="pc-right" id="p-clues"></div>
+      </div>
+      <div class="answer" id="p-answer"></div>
+      <div class="phrases">💬 <b>Useful language:</b> Where is it? · What can you see? · I think it's … · Would you like to go there?</div>
+      <div class="row">
+        <button class="btn gold" id="p-next-clue">➕ Next clue</button>
+        <button class="btn green" id="p-correct">✔ Correct for active team</button>
+        <button class="btn red" id="p-wrong">✖ Wrong (-1 clue)</button>
+        <button class="btn gray" id="p-reveal">👁 Reveal answer</button>
+        <button class="btn" id="p-next">Next postcard ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME 2 -->
+  <section id="g2">
+    <div class="panel">
+      <h2>🧳 Game 2 – Memory Match</h2>
+      <p class="sub">Pairs or groups: match each picture with its English word. Find all 8 pairs!</p>
+      <div class="stats"><span>Moves: <b id="m-moves">0</b></span><span>Pairs: <b id="m-pairs">0</b>/8</span><span>Time: <b id="m-time">0</b>s</span></div>
+      <div class="grid" id="m-grid"></div>
+      <div class="msg" id="m-msg"></div>
+      <div class="row" style="justify-content:center">
+        <button class="btn" id="m-new">🔄 New game</button>
+        <button class="btn green" id="m-award" disabled>⭐ Give +3 to active team</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME 3 -->
+  <section id="g3">
+    <div class="panel">
+      <h2>🔤 Game 3 – Word Scramble</h2>
+      <p class="sub">Unscramble the travel word in 60 seconds. Each correct word = 1 point for the active team. Type the answer and press Enter.</p>
+      <div class="stats"><span>Score: <b id="s-score">0</b></span><span>Time: <b id="s-time">60</b>s</span></div>
+      <div class="timer"><i id="s-bar"></i></div>
+      <div class="scr-emoji" id="s-emoji">🧩</div>
+      <div class="scr" id="s-word">READY?</div>
+      <div class="msg" id="s-hint"></div>
+      <input class="ans" id="s-input" placeholder="Your answer" autocomplete="off" disabled>
+      <div class="msg" id="s-msg"></div>
+      <div class="row" style="justify-content:center">
+        <button class="btn gold" id="s-start">▶ Start</button>
+        <button class="btn gray" id="s-skip" disabled>Skip ⏭</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ---------- Scoreboard ---------- */
+const teams = ["Samarkand","Bukhara","Khiva","Tashkent","Nukus","Fergana"].map(n=>({name:n,pts:0}));
+let active = 0;
+function renderBoard(){
+  const el = document.getElementById("board");
+  el.innerHTML = "";
+  teams.forEach((t,i)=>{
+    const d = document.createElement("div");
+    d.className = "team" + (i===active ? " active" : "");
+    d.innerHTML = `<b>${t.name}</b><div class="pts">${t.pts}</div>
+      <div class="adj"><button data-d="-1">−</button> <button data-d="1">+</button></div>`;
+    d.addEventListener("click",e=>{
+      const b = e.target.closest("button[data-d]");
+      if(b){ t.pts = Math.max(0, t.pts + Number(b.dataset.d)); }
+      else { active = i; }
+      renderBoard();
+    });
+    el.appendChild(d);
+  });
+}
+function addPoints(n){ teams[active].pts += n; renderBoard(); }
+renderBoard();
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll("nav button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll("nav button").forEach(x=>x.classList.remove("on"));
+    document.querySelectorAll("section").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+    document.getElementById(b.dataset.tab).classList.add("on");
+  });
+});
+
+/* ---------- Game 1: Mystery Postcard ---------- */
+const places = [
+  {emoji:"🕌🕌🕌", answer:"Registan Square", city:"Samarkand",
+   clues:["It is a famous square in Uzbekistan.","You can see three big madrasas.","The domes are blue and the walls have colourful tiles.","It is in the city of Samarkand."],
+   fact:"Registan means “sandy place” in Persian."},
+  {emoji:"🏰🌅", answer:"Itchan Kala", city:"Khiva",
+   clues:["It is an old city inside strong walls.","Tourists walk between mosques and minarets.","One short, very wide blue minaret was never finished.","The city is Khiva."],
+   fact:"Itchan Kala is the walled inner town of Khiva (Kalta Minor is the short minaret)."},
+  {emoji:"🛒🍞🌶️", answer:"Chorsu Bazaar", city:"Tashkent",
+   clues:["You can buy food here.","You can see fresh bread, nuts and spices.","The big building has a round blue dome.","It is in the capital city."],
+   fact:"Chorsu is one of the oldest markets in Tashkent."},
+  {emoji:"🚇✨", answer:"Tashkent Metro", city:"Tashkent",
+   clues:["You can travel here, but it is underground.","It is not a bus or a taxi.","Some stations look like palaces.","It is in the capital of Uzbekistan."],
+   fact:"Many Tashkent Metro stations are decorated like museums."},
+  {emoji:"⛲🌳🕌", answer:"Lyabi-Hauz", city:"Bukhara",
+   clues:["It is a quiet place in the old city.","There is a big pond in the middle.","Old trees give shade, and people drink tea.","The city is Bukhara."],
+   fact:"“Lyabi-Hauz” means “by the pond”."},
+  {emoji:"🚢🏜️", answer:"Muynak ship graveyard", city:"near Nukus (Aral Sea)",
+   clues:["You can see old ships here.","But there is sand, not water!","It is a sad but very interesting place.","It is in Karakalpakstan, near the Aral Sea."],
+   fact:"The Aral Sea has lost most of its water; old ships now stand in the desert."},
+  {emoji:"🧵🌈", answer:"Silk workshop (ikat)", city:"Margilan, Fergana Valley",
+   clues:["Tourists can watch people make something beautiful.","They use very thin threads.","The fabric has bright colours and special patterns.","It is made in Margilan, in the Fergana Valley."],
+   fact:"Margilan is famous for silk and ikat fabrics on the Silk Road."}
+];
+let pi = 0, shown = 0, revealed = false;
+const $ = id => document.getElementById(id);
+
+function renderPlace(){
+  const p = places[pi];
+  $("p-count").textContent = `Postcard ${pi+1} / ${places.length}`;
+  $("p-emoji").textContent = shown>0 ? p.emoji : "❓";
+  const box = $("p-clues"); box.innerHTML = "";
+  for(let i=0;i<4;i++){
+    const d = document.createElement("div");
+    if(i<shown){ d.className="clue"; d.textContent=`${i+1}. ${p.clues[i]}`; }
+    else { d.className="clue empty"; d.textContent=`${i+1}. ???`; }
+    box.appendChild(d);
+  }
+  const pts = Math.max(1, 5-Math.max(shown,1));
+  $("p-points").textContent = `Worth: ${pts} point${pts>1?"s":""}`;
+  const ans = $("p-answer");
+  ans.classList.toggle("show", revealed);
+  ans.innerHTML = revealed ? `<b>✅ ${p.answer}</b> – ${p.city}<br><small>${p.fact}</small>` : "";
+  $("p-next-clue").disabled = revealed || shown>=4;
+  $("p-correct").disabled = revealed || shown===0;
+  $("p-wrong").disabled = revealed || shown===0;
+  $("p-reveal").disabled = revealed;
+}
+$("p-next-clue").onclick = ()=>{ if(shown<4){ shown++; renderPlace(); } };
+$("p-correct").onclick = ()=>{ addPoints(Math.max(1,5-shown)); revealed=true; renderPlace(); };
+$("p-wrong").onclick = ()=>{
+  if(shown<4){ shown++; renderPlace(); }
+  else { revealed=true; renderPlace(); }
+};
+$("p-reveal").onclick = ()=>{ revealed=true; if(shown===0) shown=1; renderPlace(); };
+$("p-next").onclick = ()=>{ pi=(pi+1)%places.length; shown=0; revealed=false; renderPlace(); };
+renderPlace();
+
+/* ---------- Game 2: Memory Match ---------- */
+const pairs = [
+  ["🛂","passport"],["🎫","ticket"],["🧳","luggage"],["🎁","souvenir"],
+  ["🧑‍🏫","guide"],["🏨","hotel"],["🗺️","map"],["📷","camera"]
+];
+let first=null, lock=false, moves=0, found=0, mt=0, mInt=null;
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+function newMemory(){
+  clearInterval(mInt); mt=0; moves=0; found=0; first=null; lock=false;
+  $("m-moves").textContent=0; $("m-pairs").textContent=0; $("m-time").textContent=0; $("m-msg").textContent="";
+  $("m-award").disabled=true;
+  const cards=[]; pairs.forEach((p,i)=>{ cards.push({id:i,e:p[0],w:""}); cards.push({id:i,e:"",w:p[1]}); });
+  const grid=$("m-grid"); grid.innerHTML="";
+  shuffle(cards).forEach(c=>{
+    const b=document.createElement("button"); b.className="mc"; b.dataset.id=c.id;
+    b.innerHTML=`<div class="in"><div class="f">✈️</div><div class="b">${c.e?`<span class="e">${c.e}</span>`:`<span>${c.w}</span>`}</div></div>`;
+    b.onclick=()=>flipCard(b);
+    grid.appendChild(b);
+  });
+  mInt=setInterval(()=>{mt++; $("m-time").textContent=mt;},1000);
+}
+function flipCard(b){
+  if(lock||b.classList.contains("flip")||b.classList.contains("done")) return;
+  b.classList.add("flip");
+  if(!first){ first=b; return; }
+  moves++; $("m-moves").textContent=moves;
+  if(first.dataset.id===b.dataset.id){
+    first.classList.add("done"); b.classList.add("done"); first=null; found++;
+    $("m-pairs").textContent=found;
+    if(found===pairs.length){
+      clearInterval(mInt);
+      $("m-msg").innerHTML=`<span class="ok">🎉 Well done! ${moves} moves, ${mt} seconds.</span>`;
+      $("m-award").disabled=false;
+    }
+  } else {
+    lock=true;
+    setTimeout(()=>{ first.classList.remove("flip"); b.classList.remove("flip"); first=null; lock=false; },900);
+  }
+}
+$("m-new").onclick=newMemory;
+$("m-award").onclick=()=>{ addPoints(3); $("m-award").disabled=true; $("m-msg").innerHTML+=`<br><span class="ok">+3 for ${teams[active].name}!</span>`; };
+newMemory();
+
+/* ---------- Game 3: Word Scramble ---------- */
+const words = [
+  {w:"PASSPORT",e:"🛂",h:"You need it to travel abroad. (pasport)"},
+  {w:"TICKET",e:"🎫",h:"You buy it for a train or a plane. (chipta)"},
+  {w:"LUGGAGE",e:"🧳",h:"Bags and suitcases. (yuk, bagaj)"},
+  {w:"SOUVENIR",e:"🎁",h:"A small gift to remember a place. (esdalik)"},
+  {w:"GUIDE",e:"🧑‍🏫",h:"A person who shows tourists around. (gid)"},
+  {w:"HOSTEL",e:"🛏️",h:"A cheap place to stay. (hostel)"},
+  {w:"LANDMARK",e:"🏛️",h:"A famous building or place. (mashhur obida)"},
+  {w:"ITINERARY",e:"📋",h:"A plan of your trip. (marshrut)"},
+  {w:"TOURIST",e:"📸",h:"A person who visits places for fun. (sayyoh)"},
+  {w:"DESTINATION",e:"📍",h:"The place you are going to. (manzil)"}
+];
+let queue=[], cur=null, score=0, left=60, sInt=null, running=false;
+function scramble(w){
+  let s; let tries=0;
+  do{ s=shuffle(w.split("")).join(""); tries++; }while(s===w && tries<20);
+  return s;
+}
+function nextWord(){
+  if(!queue.length) queue=shuffle(words);
+  cur=queue.pop();
+  $("s-word").textContent=scramble(cur.w);
+  $("s-emoji").textContent=cur.e;
+  $("s-hint").textContent="💡 "+cur.h;
+  $("s-input").value=""; $("s-input").focus();
+}
+function endScramble(){
+  clearInterval(sInt); running=false;
+  $("s-input").disabled=true; $("s-skip").disabled=true; $("s-start").disabled=false; $("s-start").textContent="▶ Play again";
+  $("s-word").textContent="TIME!"; $("s-emoji").textContent="⏰"; $("s-hint").textContent="";
+  $("s-msg").innerHTML=`<span class="ok">${score} word${score===1?"":"s"} · +${score} for ${teams[active].name}</span>`;
+  addPoints(score);
+}
+$("s-start").onclick=()=>{
+  score=0; left=60; queue=[]; running=true;
+  $("s-score").textContent=0; $("s-time").textContent=60; $("s-msg").textContent="";
+  $("s-input").disabled=false; $("s-skip").disabled=false; $("s-start").disabled=true;
+  $("s-bar").style.transition="none"; $("s-bar").style.width="100%";
+  void $("s-bar").offsetWidth; $("s-bar").style.transition="width 1s linear";
+  nextWord();
+  clearInterval(sInt);
+  sInt=setInterval(()=>{
+    left--; $("s-time").textContent=left; $("s-bar").style.width=(left/60*100)+"%";
+    if(left<=0) endScramble();
+  },1000);
+};
+$("s-skip").onclick=()=>{ if(running){ $("s-msg").innerHTML=`<span class="no">Skipped: ${cur.w}</span>`; nextWord(); } };
+$("s-input").addEventListener("keydown",e=>{
+  if(e.key!=="Enter"||!running) return;
+  const v=$("s-input").value.trim().toUpperCase();
+  if(v===cur.w){ score++; $("s-score").textContent=score; $("s-msg").innerHTML=`<span class="ok">✔ Correct!</span>`; nextWord(); }
+  else { $("s-msg").innerHTML=`<span class="no">✖ Try again</span>`; $("s-input").select(); }
+});
+</script>
+
+</body></html>
